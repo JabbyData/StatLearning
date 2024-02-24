@@ -60,7 +60,7 @@ MSE_opti <- mean(MSE_opti)
 MSE_opti # around 21
 
 # K-fold cross validation for k = 2 using library boot
-set.seed(1) # for reproductibility
+#set.seed(1) # for reproductibility
 glm.fit <- glm(mpg~horsepower + I(horsepower^2),data=Auto)
 CV_MSE <- rep(0,14)
 # K-fold cross validation for different values of K
@@ -81,7 +81,7 @@ alpha.fn <- function(data, index){
 alpha.fn(Portfolio , 1:100) # Estimates of alpha using the first 100 observations
 
 # With remplacement
-set.seed(1) # for reproductibility
+#set.seed(1) # for reproductibility
 alpha.fn(Portfolio , sample(100,100,replace=TRUE)) # around 0.576
 
 # Using boot
@@ -91,5 +91,5 @@ boot(Portfolio,alpha.fn,R=1000) # 1000 bootstrap estimates for alpha, we find an
 boot.fn <- function(data , index){
   coef(lm(mpg ~ horsepower , data = data , subset = index))
 }
-boot(Auto,boot.fn,R=1000) # sampling estimation of slope and intercept for the LR mpg ~ horsepower
+boot(Auto,boot.fn,R=1) # sampling estimation of slope and intercept for the LR mpg ~ horsepower
 summary(lm(mpg ~ horsepower , data = Auto)) # Results are very close
