@@ -34,7 +34,7 @@ MSEs <- rep(0,10)
 Preds <- list()
 # Starting with the null model
 #lm.fit <- lm(Balance~1,data=Credit) # predict balance's mean, not using it because hide other results
-all.equal(summary(lm.fit)$coef[1], mean(Balance)) # check equality between the two values
+#all.equal(summary(lm.fit)$coef[1], mean(Balance)) # check equality between the two values
 preds_available <- 1:10
 # preds_available <- preds_available[-which(preds_available == 2)] # drop the elt equals to 2
 
@@ -55,7 +55,7 @@ for (p in 1:10){
 }
 
 # plot results
-plot(1:10,MSEs,xlab="nb of predictors",ylab="MSE CV",type="b",col="red")
+plot(1:10,MSEs,xlab="nb of predictors",ylab="MSE CV",type="b",col="red",main="StepWise Selection")
 
 # displaying best predictors
 for (k in 1:length(Preds)){
