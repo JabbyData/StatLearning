@@ -81,8 +81,8 @@ for (alpha in alphas){
   cat("alpha : ",alpha,"\n")
   # Elastic Net Model
   lasso.mod <- glmnet(MHitters[train,],YHitters[train],alpha=alpha,lambda = grid) # initial model
-  EN.model <- cv.glmnet(MHitters[train,],YHitters[train],alpha=alpha) # 10-folds CV to find the optimal alpha
-  lasso.pred <- predict(lasso.mod,s=lasso.mod$lambda.min,newx=MHitters[-train,])
+  EN.model <- cv.glmnet(MHitters[train,],YHitters[train],alpha=alpha) # 10-folds CV to find the optimal lambda
+  lasso.pred <- predict(lasso.mod,s=lasso.mod$lambda.min,newx=MHitters[-train,]) # prediction using the optimal value for lambda
   # MSE
   MSE_CV <- mean((lasso.pred - YHitters[-train])^2)
   if (MSE_CV < MSE_min){
