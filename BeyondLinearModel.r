@@ -2,6 +2,7 @@ library(ISLR2)
 library(pscl)
 library(car)
 library(splines)
+library(gam)
 attach(Wage)
 ?Wage
 
@@ -105,3 +106,9 @@ sm.fit2 <- smooth.spline(age,wage,cv=T) # LOOCV to find to optimal tuning parame
 lines(sm.fit,col="red",lwd=2)
 lines(sm.fit2,col="purple",lwd=2)
 legend("topright",legend=c("16 DF","6.8 DF"),col=c("red","purple"),lwd=1)
+
+# GAMs
+gam.m1 <- gam(wage~s(age,5)+education,data=Wage)
+gam.m2 <- gam(wage~year+s(age,5)+education,data=Wage)
+gam.m3 <- gam(wage~s(year,4)+s(age,5)+education,data=Wage)
+anova(gam.m1,gam.m2,gam.m3,test="F") # anova not really adapted to GAMs
