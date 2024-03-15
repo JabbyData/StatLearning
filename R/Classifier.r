@@ -1,0 +1,10 @@
+library(tree)
+library(ISLR2)
+attach(Carseats)
+?Carseats
+High <- factor(ifelse(Sales <= 8, "No", "Yes"))
+Carseats <- data.frame(Carseats,High)
+tree.carseats <- tree(High~. - Sales,Carseats)
+summary(tree.carseats)
+plot(tree.carseats)
+text(tree.carseats)
