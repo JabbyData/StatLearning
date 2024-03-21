@@ -16,7 +16,7 @@ warnings.filterwarnings("ignore", category=FutureWarning) # to prevent huge amou
 
 # Preprocessing the data
 # Verifying data leakage
-data = pd.read_csv("../Data/CreditDefault/UCI_Credit_Card.csv")
+data = pd.read_csv("../../Data/CreditDefault/UCI_Credit_Card.csv")
 if not data.isnull().any().any():
     print("No data leakage found")
 else:
