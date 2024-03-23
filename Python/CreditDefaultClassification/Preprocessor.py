@@ -1,28 +1,55 @@
 """ Module to preprocess the data """
 import pandas as pd
+from sklearn.preprocessing import StandardScaler, OneHotEncoder, Normalizer
 
 
-def normalize(data,a,b,feature_threshold=20):
-    new_data = data.copy()
-    """ Normalize the data within the interval [a,b] """
-    for feature in data.columns:
-        if data[feature].nunique() < feature_threshold:
-            # Performs One-hot encoding
-            new_data = pd.get_dummies(new_data, columns=[feature])
+def standardize(data,feature_threshold=80):
+    """ Returns a standardized copy of the data """
+    # Looking for the numerical and categorical columns
+    num_cols = []
+    cat_cols = []
+    for col in data.columns:
+        if data[col].unique().shape[0] < feature_threshold:  # arbitrary threshold so that LIMIT_BAL is not considered as a categorical variable
+            cat_cols.append(col)
         else:
-            # Performs normalization
-            new_data[feature] = a + (data[feature] - data[feature].min()) / (data[feature].max() - data[feature].min()) * (b - a)
+            num_cols.append(col)
+    cat_df = data[cat_cols]
+    num_df = data[num_cols]
+
+    # Scaling of num_df
+    scaler = StandardScaler()
+    num_df_scaled = pd.DataFrame(scaler.fit_transform(num_df), columns=num_cols)
+
+    # One hot encoding of cat_df
+    encoder = OneHotEncoder()
+    cat_df_encoded = pd.DataFrame(encoder.fit_transform(cat_df).toarray(),columns=encoder.get_feature_names_out(cat_cols))
+
+    # Concatenation of the two dataframes
+    new_data = pd.concat([num_df_scaled, cat_df_encoded], axis=1)
     return new_data
 
 
-def standardize(data,feature_threshold=100):
-    new_data = data.copy()
-    """ Standardize the data """
-    for feature in data.columns:
-        if data[feature].nunique() < feature_threshold:
-            # Performs One-hot encoding
-            new_data = pd.get_dummies(new_data, columns=[feature])
+def normalize(data,feature_threshold=80):
+    """ Returns a normalized copy of the data """
+    # Looking for the numerical and categorical columns
+    num_cols = []
+    cat_cols = []
+    for col in data.columns:
+        if data[col].unique().shape[0] < feature_threshold:  # arbitrary threshold so that LIMIT_BAL is not considered as a categorical variable
+            cat_cols.append(col)
         else:
-            # Performs standardization
-            new_data[feature] = (data[feature] - data[feature].mean()) / data[feature].std()
+            num_cols.append(col)
+    cat_df = data[cat_cols]
+    num_df = data[num_cols]
+
+    # Scaling of num_df
+    scaler = Normalizer()
+    num_df_scaled = pd.DataFrame(scaler.fit_transform(num_df), columns=num_cols)
+
+    # One hot encoding of cat_df
+    encoder = OneHotEncoder()
+    cat_df_encoded = pd.DataFrame(encoder.fit_transform(cat_df).toarray(),columns=encoder.get_feature_names_out(cat_cols))
+
+    # Concatenation of the two dataframes
+    new_data = pd.concat([num_df_scaled, cat_df_encoded], axis=1)
     return new_data

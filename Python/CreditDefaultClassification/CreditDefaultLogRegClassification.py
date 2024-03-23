@@ -16,9 +16,11 @@ data = pd.read_csv("../../Data/CreditDefault/UCI_Credit_Card.csv")
 data = data.drop(columns='ID') # cf natural indexing
 
 # 10-fold Cross validation
-lr = LogisticRegression()
+lr = LogisticRegression(solver='newton-cholesky') # newton cholesky since nb_obs >> nb_features
 X = data.iloc[:,:-1]
 Y = data.iloc[:,-1]
+
+# Perform cross-validation with stratified folds
 accuracies = cross_val_score(lr, X, Y, cv=10)
 
 # Plotting the results
@@ -28,15 +30,19 @@ plt.xlabel("Fold number")
 plt.ylabel("Accuracy")
 plt.show()
 
-print("Log Reg with original data: ", np.mean(accuracies)) # 0.7786, not bad
+# cross_val_score uses well stratified folds
+
+print("Log Reg with original data: ", np.mean(accuracies)) # 0.8098, not bad
 
 # Trying to improve the accuracy
 
 # Scaling the data
 # Normalizing the data
-normalized_data = Preprocessor.normalize(data,0,1)
+normalized_data = Preprocessor.normalize(data)
+
 X = normalized_data.iloc[:,:-1]
 Y = normalized_data.iloc[:,-1]
+
 print("Log Reg with normalized data : ",np.mean(cross_val_score(lr, X, Y, cv=10))) # 100%, strange ...
 
 # Standardizing the data
