@@ -1,5 +1,4 @@
 """ Module to perform bagging and improve our simple model """
-import BasicClassifierTree
 import numpy as np
 from sklearn.metrics import accuracy_score
 def Bagging(decisionTree,dataset,B):

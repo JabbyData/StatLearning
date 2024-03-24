@@ -3,6 +3,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 from Python.DecisionTree import Bagging, BasicClassifierTree
+from sklearn.ensemble import RandomForestClassifier
 
 col_names = ['sepal_length', 'sepal_width', 'petal_length', 'petal_width', 'type']
 data = pd.read_csv("../../Data/iris/Iris.csv", skiprows=1, header=None, names=col_names)
@@ -22,3 +23,11 @@ print("Accuracy using basic classifier :",accuracy_score(Y_test, Y_pred))
 # Testing Bagging
 bagging_preds, bagging_score = Bagging.Bagging(CT, data, 10)
 print("Accuracy using bagging : ",bagging_score)
+
+# Performing Random Forest
+rfc = RandomForestClassifier(n_estimators=100)
+Y_train = np.ravel(Y_train) # format conversion
+# print(Y_train.shape)
+rfc.fit(X_train,Y_train)
+Y_pred = rfc.predict(X_test)
+print("Accuracy using Random Forest : ",accuracy_score(Y_test, Y_pred)) # a little bit less efficient than the original model, maybe because we are in low dimensions
