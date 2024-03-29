@@ -154,11 +154,10 @@ class DecisionTreeClassifier():
     def fit(self,X,Y):
         """ Create the dataframe and fit the model on it """
         data = np.concatenate((X,Y),axis=1)
-        self.build_tree(data)
+        return self.build_tree(data)
 
     def predict(self, X):
         ''' function to predict new dataset '''
-
         predictions = [self.make_prediction(x, self.root) for x in X]
         return predictions
 
