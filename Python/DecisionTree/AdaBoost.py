@@ -19,12 +19,14 @@ class AdaBoostClassifier():
             # building the next stump
             weak_learner = dtc(min_samples_split=1,max_depth=0) # one node
             weak_learner.root = weak_learner.fit(X,y)
-
             # computing total error
             total_error = self.total_error(weak_learner, X, y)
 
             # computing the amount of say
-            amount_of_say = 0.5*np.log((1-total_error)/total_error)
+            if total_error == 0 or total_error == 1:
+                amount_of_say = 1
+            else:
+                amount_of_say = 0.5*np.log((1-total_error)/total_error)
 
             # updating the weights
             for i in range(n_samples):
