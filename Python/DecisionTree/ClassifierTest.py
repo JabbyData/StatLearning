@@ -5,6 +5,8 @@ from sklearn.metrics import accuracy_score
 from Python.DecisionTree import Bagging, BasicClassifierTree
 from sklearn.ensemble import RandomForestClassifier
 from AdaBoost import AdaBoostClassifier as ABC
+from sklearn.ensemble import AdaBoostClassifier
+import random as rd
 
 col_names = ['sepal_length', 'sepal_width', 'petal_length', 'petal_width', 'type']
 data = pd.read_csv("../../Data/iris/Iris.csv", skiprows=1, header=None, names=col_names)
@@ -34,11 +36,22 @@ data['type'] = data['type'].map(mapping)
 # print("Accuracy using Random Forest : ",accuracy_score(Y_test, Y_pred)) # a little bit less efficient than the original model, maybe because we are in low dimensions
 
 # AdaBoost Test
+rd.seed(42)
+# Performing binary classification tasks
+data = pd.read_csv("../../Data/CreditDefault/UCI_Credit_Card.csv")
+data = data.drop(columns='ID') # cf natural indexing
+data = data.sample(1000)
+print("Basic Classifier : ",len(data[data['default.payment.next.month']==0])/len(data)) # basic accuracy of 0.776
 X,y = data.iloc[:,:-1].values, data.iloc[:,-1].values.reshape(-1,1)
 abc = ABC()
 stumps, asays = abc.fit(X,y,3)
-# print(stumps)
-# print(asays)
+for i,stump in enumerate(stumps):
+    stump.display(data.columns.tolist(),f'stump {i}')
+
 # # Prediction test
-# print(round(abc.make_prediction(X[3])))
-print("Accuracy with AdaBoost : ",abc.score_accuracy(X,y))
+print("Accuracy with AdaBoost : ",abc.score_accuracy(X,y)) # 0.823 not bad
+
+# comparison with sklearn
+clf = AdaBoostClassifier(n_estimators=3)
+clf.fit(X,y)
+print("Accuracy with sklearn : ",clf.score(X,y)) # 0.824, really close to the previous result

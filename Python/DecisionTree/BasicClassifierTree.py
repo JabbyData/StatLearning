@@ -134,11 +134,11 @@ class DecisionTreeClassifier():
         return max(Y, key=Y.count)
 
 
-    def display(self,feature_names):
+    def display(self,feature_names,name):
         G = pgv.AGraph(directed=True)
         self.display_rec(self.root,G,feature_names)
         G.layout()
-        G.draw('../../Plots/graph.png', prog='dot')
+        G.draw('../../Plots/' + name + '.png', prog='dot')
 
     def display_rec(self,node,G,feature_names):
         if node.value is not None:
