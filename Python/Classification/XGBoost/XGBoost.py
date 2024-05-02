@@ -1,6 +1,6 @@
 """ Module implementing the XGBoost algorithm """
 import numpy as np
-
+import XGBoostTree
 #### 2 different types of tasks : Classification and Regression ####
 
 
@@ -33,7 +33,9 @@ class XGBoostClassifier :
         self.max_iter -= 1
         self.fit_rec(features, target)
 
-    def build_xgb_tree(self,features, target):
+    def build_xgb_tree(self,features, residuals, max_depth):
         """ Build a tree that fit residuals and returns output values """
-        pass
+        xgb_tree = XGBoostTree.XGBTree(max_depth)
+        xgb_tree.fit(features, self.predictions, residuals)
+
 
