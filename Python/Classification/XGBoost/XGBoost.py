@@ -50,7 +50,7 @@ class XGBoost:
         for tree in self.learners:
             output_values = tree.predict(features, preds)
             preds += self.learning_rate * output_values
-        return preds.map(round)
+        return np.round(preds)
 
     def score_train_test(self,dataset, random_state=42, test_size=0.2):
         """ compute the score of the model on a dataset """
@@ -61,5 +61,5 @@ class XGBoost:
         y_train.index = index_train
         X_test.index = index_test
         y_test.index = index_test
-        train_preds = self.fit(X_train, y_train)
+        train_preds = np.round(self.fit(X_train, y_train))
         return np.mean(train_preds == y_train), np.mean(self.predict(X_test) == y_test)

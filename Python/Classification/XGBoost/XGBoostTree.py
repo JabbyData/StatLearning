@@ -1,7 +1,7 @@
 """ Module Implementing XBG learners """
 import numpy as np
 class XGBNode():
-    """ For now without pruning """
+    """ XGBTree node (without pruning) """
     def __init__(self, left_son=None, right_son=None, residuals=None, residuals_index=None, mode="C"):
         self.left_son = left_son
         self.right_son = right_son
@@ -11,12 +11,14 @@ class XGBNode():
         self.learning_step = []
         self.output_value = 0
     def get_similarity_score(self, predictions):
+        """ Returns the similarity score of the node (without pruning) """
         if self.mode == "C":
             return np.sum(self.residuals)**2 / (np.sum(predictions * (1 - predictions)))
         elif self.mode == "R":
             return np.sum(self.residuals)**2 / (np.shape(self.residuals)[0])
 
     def similarity_score_gain(self, left_index, right_index, predictions):
+        """ Computes the SS_gain """
         if self.mode == "C":
             ss_l = np.sum(self.residuals[left_index])**2 / np.sum(predictions[left_index] * (1 - predictions[left_index]))
             ss_r = np.sum(self.residuals[right_index])**2 / np.sum(predictions[right_index] * (1 - predictions[right_index]))
@@ -47,22 +49,33 @@ class XGBNode():
 
         return ss_left_index_best, ss_right_index_best, feat_best, threshold_best
 
+    def compute_output_value(self,predictions):
+        """ Computes the output_value of the current node """
+        output_value = 0
+        if self.mode == "C":
+            output_value = np.sum(self.residuals) / np.sum(predictions * (1 - predictions))
+        elif self.mode == "R":
+            output_value = np.sum(self.residuals) / np.shape(self.residuals)[0]
+        return output_value
+
+
     def fit_rec(self, features, predictions, depth, max_depth, output_values, min_samples_split):
+        """ Build recursively the learner """
         if depth < max_depth:
             left_index, right_index, feat_split, thresold_split = self.split(features, predictions, min_samples_split)
-            self.learning_step = [feat_split, thresold_split]
-            self.left_son = XGBNode(residuals=self.residuals[left_index], residuals_index=left_index, mode=self.mode)
-            self.right_son = XGBNode(residuals=self.residuals[right_index], residuals_index=right_index, mode=self.mode)
-            output_values = self.left_son.fit_rec(features, predictions, depth + 1, max_depth, output_values, min_samples_split)
-            output_values = self.right_son.fit_rec(features, predictions, depth + 1, max_depth, output_values, min_samples_split)
+            if feat_split is not None:
+                self.learning_step = [feat_split, thresold_split]
+                self.left_son = XGBNode(residuals=self.residuals[left_index], residuals_index=left_index, mode=self.mode)
+                self.right_son = XGBNode(residuals=self.residuals[right_index], residuals_index=right_index, mode=self.mode)
+                output_values = self.left_son.fit_rec(features, predictions, depth + 1, max_depth, output_values, min_samples_split)
+                output_values = self.right_son.fit_rec(features, predictions, depth + 1, max_depth, output_values, min_samples_split)
+                return output_values
+            output_value = self.compute_output_value(predictions)
+            output_values[self.residuals_index] = output_value
+            self.output_value = output_value
             return output_values
         else:
-            # compute the output value of the current leaf
-            output_value = 0
-            if self.mode == "C":
-                output_value = np.sum(self.residuals) / np.sum(predictions * (1 - predictions))
-            elif self.mode == "R":
-                output_value = np.sum(self.residuals) / np.shape(self.residuals)[0]
+            output_value = self.compute_output_value(predictions)
             output_values[self.residuals_index] = output_value
             self.output_value = output_value
             return output_values
@@ -80,7 +93,7 @@ class XGBTree():
             output_values = self.root.fit_rec(features, predictions, 0, self.max_depth, np.zeros((len(residuals),)), self.min_samples_split)
             return output_values
 
-    def predict(self, features, predictions):
+    def predict(self, features):
         output_values = np.zeros((features.shape[0],))
         output_index = np.arange(features.shape[0])
         self.fill_output_values(self.root, features, output_values, output_index)
@@ -100,5 +113,3 @@ class XGBTree():
         else:
             output_values[output_index] = node.output_value
             return output_values
-
-
